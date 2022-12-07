@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn import tree, linear_model, neighbors
+from sklearn import tree, linear_model, neighbors, naive_bayes, cluster
 
 class Report:
     def __init__(self):
@@ -75,7 +75,7 @@ class LinearRegressionResult(Report):
         print(f'Mean Absolute Error        (MAE):  {self.MAE_metrics}')
         print(f'Mean Squared Error         (MSE):  {self.MSE_metrics}')
         print(f'Root Mean Squared Error   (RMSE):  {self.RMSE_metrics}')
-        print('\n...Fim do Overview...')
+        print('\n...Fim do Overview da Regressão Linear...')
         
 
 
@@ -88,7 +88,7 @@ class LogisticRegressionResult(Report):
 
         self.print_reports()
         
-        print('\n...Fim do Overview...')
+        print('\n...Fim do Overview da Regressão Logística...')
         
         
 class KNNResult(Report):
@@ -100,7 +100,7 @@ class KNNResult(Report):
 
         self.print_reports()
         
-        print('\n...Fim do Overview...')
+        print('\n...Fim do Overview do KNN...')
         
         
 class DecisionTreeResult(Report):
@@ -112,5 +112,28 @@ class DecisionTreeResult(Report):
 
         self.print_reports()
         
-        print('\n...Fim do Overview...')
+        print('\n...Fim do Overview da Árvore de Decisão...')
+        
+        
+class KMeansResult(Report):
+    def __init__(self):
+        self.kmeans_model: cluster.KMeans = None
+    
+    def print_overview(self):
+        print("\n...Kmeans Finalizado...\n")
+
+        self.print_reports(False)
+        
+        print('\n...Fim do Overview do Kmeans...')
+        
+class NaivesBayesResult(Report):
+    def __init__(self):
+        self.nb_model: naive_bayes.GaussianNB = None
+    
+    def print_overview(self):
+        print("\n...Naives Bayes Finalizado...\n")
+
+        self.print_reports()
+        
+        print('\n...Fim do Overview do Naives Bayes...')
         

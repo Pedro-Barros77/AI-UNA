@@ -6,14 +6,14 @@ from sklearn.metrics import classification_report, confusion_matrix
 from domain.models.results import DecisionTreeResult
 
 
-def decision_tree(dataset: pd.DataFrame, target: str, tree_depth: int, dataset_usage: float) -> DecisionTreeResult:
+def decision_tree(dataset: pd.DataFrame, target: str, tree_depth: int, df_test_size: float) -> DecisionTreeResult:
     """Executes Decision Tree on given DataFrame.
 
     Args:
         dataset (pd.DataFrame): The DataFrame containing the data to train on.
         target (str): The name of the target column.
         tree_depth (int): Number of tree nodes to generate from root.
-        dataset_usage (float): Percentage of the dataframe (0-1) to use for training.
+        df_test_size (float): Percentage of the dataframe (0-1) to use for testing.
 
     Returns:
         DecisionTreeResult: A class object containig results data.
@@ -24,7 +24,8 @@ def decision_tree(dataset: pd.DataFrame, target: str, tree_depth: int, dataset_u
     x = dataset.drop([target],axis=1)
     y = dataset[target]
     
-    x_train, x_test, y_train, y_test = train_test_split(x.values, y.values, test_size=dataset_usage, random_state=0)
+    # getting train and test data
+    x_train, x_test, y_train, y_test = train_test_split(x.values, y.values, test_size=df_test_size, random_state=0)
 
     # training and learning
     tree_model = tree.DecisionTreeClassifier(criterion='entropy', max_depth=tree_depth)

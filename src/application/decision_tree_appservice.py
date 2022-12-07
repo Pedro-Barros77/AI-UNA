@@ -8,13 +8,13 @@ from domain.models.results import DecisionTreeResult
 from domain.services import decision_tree_service
 
 
-def decision_tree(dataset: pd.DataFrame, tree_depth: int = 10, dataset_usage: float = 0.7,  open_file = False) -> DecisionTreeResult:
+def decision_tree(dataset: pd.DataFrame, tree_depth: int = 10, df_test_size: float = 0.3,  open_file = False) -> DecisionTreeResult:
     """Executes Decision Tree on given DataFrame.
 
     Args:
         dataset (pd.DataFrame): The DataFrame containing the data to train on.
         tree_depth (int, optional): Number of tree nodes to generate from root. Defaults to 10.
-        dataset_usage (float, optional): Percentage of the dataframe (0-1) to use for training. Defaults to 0.7.
+        df_test_size (float, optional): Percentage of the dataframe (0-1) to use for testing. Defaults to 0.3 (30%).
         open_file (bool, optional): If the png exported tree file should be opened after creation. Defaults to False.
 
     Returns:
@@ -38,7 +38,7 @@ def decision_tree(dataset: pd.DataFrame, tree_depth: int = 10, dataset_usage: fl
     # dropping score columns that are not the target    
     df = df.drop(["Downloads","numberreviews","five", "four", "three", "two", "one", "rating"],axis=1)
     
-    result = decision_tree_service.decision_tree(df,target, tree_depth, dataset_usage)
+    result = decision_tree_service.decision_tree(df,target, tree_depth, df_test_size)
     
     # creates tree dot file
     dot_data = tree.export_graphviz(result.tree_model, out_file=None,

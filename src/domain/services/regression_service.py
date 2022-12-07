@@ -6,12 +6,13 @@ from sklearn import metrics
 
 from domain.models.results import LinearRegressionResult, LogisticRegressionResult
 
-def linear(dataset: pd.DataFrame, target:str, dataset_usage: float) -> LinearRegressionResult:
+def linear(dataset: pd.DataFrame, target:str, df_test_size: float) -> LinearRegressionResult:
     """Executes Linear Regression on given DataFrame
 
     Args:
-        df (pd.DataFrame): The DataFrame containing the data to train on.
-        dataset_usage (float): Percentage of the dataframe (0-1) to use for training.
+        dataset (pd.DataFrame): The DataFrame containing the data to train on.
+        target (str): The name of the target column.
+        df_test_size (float): Percentage of the dataframe (0-1) to use for testing.
 
     Returns:
         LinearRegressionResult: A class object containig results data.
@@ -26,7 +27,7 @@ def linear(dataset: pd.DataFrame, target:str, dataset_usage: float) -> LinearReg
     y = dataset[target]
     
     # getting train and test data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=dataset_usage, random_state=0)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=df_test_size, random_state=0)
     
     # training and learning
     linear_model = LinearRegression()
@@ -55,12 +56,13 @@ def linear(dataset: pd.DataFrame, target:str, dataset_usage: float) -> LinearReg
 
 
 
-def logistic(dataset: pd.DataFrame, target:str, dataset_usage: float) -> LogisticRegressionResult:
+def logistic(dataset: pd.DataFrame, target:str, df_test_size: float) -> LogisticRegressionResult:
     """Executes Logistic Regression on given DataFrame
 
     Args:
         df (pd.DataFrame): The DataFrame containing the data to train on.
-        dataset_usage (float): Percentage of the dataframe (0-1) to use for training.
+        target (str): The name of the target column.
+        df_test_size (float): Percentage of the dataframe (0-1) to use for testing.
 
     Returns:
         LinearRegressionResult: A class object containig results data.
@@ -73,7 +75,7 @@ def logistic(dataset: pd.DataFrame, target:str, dataset_usage: float) -> Logisti
     y = dataset[target]
     
     # getting train and test data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=dataset_usage, random_state=0)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=df_test_size, random_state=0)
     
     # training and learning
     logistic_model = LogisticRegression(solver='lbfgs',max_iter=1000)

@@ -14,18 +14,18 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.preprocessing import StandardScaler
 import matplotlib.patches as mpatches
 
-from domain.models.results import KNNResult
+from domain.models.results import KNNResult, KMeansResult
 
 
 
-def knn(dataset: pd.DataFrame, target: str, num_neighbors:int, dataset_usage: float) -> KNNResult:
+def knn(dataset: pd.DataFrame, target: str, num_neighbors:int, df_test_size: float) -> KNNResult:
     """Executes K-Nearest Neighbors on given DataFrame.
 
     Args:
         dataset (pd.DataFrame): The DataFrame containing the data to train on.
         target (str): The name of the target column.
         num_neighbors (int): Number of neighbors to calculate distance to.
-        dataset_usage (float): Percentage of the dataframe (0-1) to use for training.
+        df_test_size (float): Percentage of the dataframe (0-1) to use for testing.
 
     Returns:
         KNNResult: A class object containig results data.
@@ -38,7 +38,7 @@ def knn(dataset: pd.DataFrame, target: str, num_neighbors:int, dataset_usage: fl
     y = dataset[target].values
     
     # getting train and test data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=dataset_usage, random_state=0, stratify=y)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=df_test_size, random_state=0, stratify=y)
     
     # training and learning
     knn_model = KNeighborsClassifier(n_neighbors=num_neighbors)
@@ -58,7 +58,7 @@ def knn(dataset: pd.DataFrame, target: str, num_neighbors:int, dataset_usage: fl
 
 def get_best_n_clusters(x, show_results = False) -> int:
     print('Calculando melhor número de clusters...')
-    # valores candidatos ao n° de centroides
+    # candidates for centroids number
     parameters = [2, 3, 4, 5, 10, 15, 20]
     
     parameter_grid = ParameterGrid({'n_clusters': parameters})
@@ -66,16 +66,16 @@ def get_best_n_clusters(x, show_results = False) -> int:
     kmeans_model = KMeans()
     silhouette_scores = []
    
-    # processa KMeans para cada opção de n_clusters e atualiza o best_score
+    # processes KMeans for each option of n_clusters and update the best_score
     for i, p in enumerate(parameter_grid, start=1):
         kmeans_model.set_params(**p)
         kmeans_model.fit(x)
         current_score = metrics.silhouette_score(x, kmeans_model.labels_)
         silhouette_scores += [current_score]
-        # atualiza o maior valor
+        
+        # updates the best score
         if current_score > best_score:
             best_score = current_score
-        # best_score = max([best_score, current_score])
             
         if show_results:
             print('Clusters:', p, 'Score', current_score)
@@ -94,7 +94,7 @@ def get_best_n_clusters(x, show_results = False) -> int:
     best_n_clusters = parameters[best_index]
     return best_n_clusters
 
-def kmeans(dataset: pd.DataFrame, target: str, dimensions: tuple[str,str] | None, num_clusters: int | None):
+def kmeans(dataset: pd.DataFrame, target: str, dimensions: tuple[str,str] | None, num_clusters: int | None) -> KMeansResult:
     """Executa o algoritmo KMeans no dataframe especificado.
 
     Args:
@@ -104,16 +104,18 @@ def kmeans(dataset: pd.DataFrame, target: str, dimensions: tuple[str,str] | None
         num_clusters (int | None): O número de clusters (centróides) a serem criados. Caso seja none, serão feitos testes com os valores [2, 3, 4, 5, 10, 15, 20] e escolhido aquele que apresentar o maior score.
     """    
     
-    # cria uma cópia do dataset para transformar as escalas
+    result = KMeansResult()
+    
+    # creates a copy of the dataset to transform scales
     scaled_dataset = dataset[:].drop(['top_rating'], axis=1)
     
-    # transforma as escalas para uma magnitude padrão
+    # transform scales to a common magnitude
     scaled_dataset[scaled_dataset.columns] = StandardScaler().fit_transform(scaled_dataset)
     
     _labels = ('','')
     _title = ''
     
-    # se as dimensões não forem especificadas, realizar PCA para obter as viariáveis de maior importância (peso), unificando-as em 2 dimensões
+    # if the dimensions are not specified, do PCA to get the variables with most weight, combining into 2 dimensions
     if dimensions == None:
         pca_2 = PCA(n_components=2)
         pca_2_result = pca_2.fit_transform(scaled_dataset)
@@ -131,46 +133,52 @@ def kmeans(dataset: pd.DataFrame, target: str, dimensions: tuple[str,str] | None
         X = np.array(scaled_dataset[[dimensions[0], dimensions[1]]])
         
         
-    # n° de centróides especificado ou calculado
+    # number of clusters specified or calculated
     n_centroides = num_clusters if num_clusters != None else get_best_n_clusters(X)
-    # executa o algoritm KMeans
-    kmeans = KMeans(n_clusters= n_centroides, random_state=0).fit(X)
-    # obtém os agrupamentos (grupos de centróides)
-    agrupamento = kmeans.predict(X)
     
-    # ----Exibindo Valores Agrupados----
+    # execute KMEans algorythm
+    kmeans_model = KMeans(n_clusters= n_centroides, random_state=0).fit(X)
     
-    # exibe gráfico em tela
-    plot_agrupamento(X, agrupamento, kmeans.cluster_centers_, _labels, None, _title + f' ({n_centroides} centróides)')
+    #get groups (clusters)
+    agrupamento = kmeans_model.predict(X)
+    
+    # ----Plotting grouped values----
+
+    plot_grouping(X, agrupamento, kmeans_model.cluster_centers_, _labels, None, _title + f' ({n_centroides} centróides)')
     
     
-    # ----Exibindo Valores Reais----
+    # ----Plotting real values----
     
     _legends = ('Rating Abaixo 4.5', 'Rating Acima 4.5')
     _title = "Valores reais utilizando" + (" PCA" if 'PCA' in _labels[0] else " duas dimensões")
     
-    # substitui valores da coluna target por legenda amigável
+    # replace target column values to a label
     dataset[target].replace(0, _legends[0], inplace=True)
     dataset[target].replace(1, _legends[1], inplace=True)
     
     principal_df = pd.DataFrame(data = X, columns = _labels)
     
-    # exibe gráfico em tela
     plot_real(principal_df, dataset, target, _labels, _legends, _title)
     
     plt.show()
     
+    result.knn_model = kmeans_model
+    result.normalized_data = dataset
+    result.score = kmeans_model.score(X)
+    
+    return result
+    
 
-def plot_agrupamento(x: pd.DataFrame | np.ndarray, agrupamento: np.ndarray[int], centroides: list[tuple[int, int]], labels: tuple[str,str], legends: tuple[str,str] | None, title: str):
-    """Exibe em tela um gráfico de dispersão, contentdo o número de centroides (clusters) especificado.
+def plot_grouping(x: pd.DataFrame | np.ndarray, groups: np.ndarray[int], clusters: list[tuple[int, int]], labels: tuple[str,str], legends: tuple[str,str] | None, title: str):
+    """Show on the screen a scatter graphic, with the specified number of clusters.
 
     Args:
-        x (pd.DataFrame | np.ndarray): Coleção contendo os dados a serem plotados.
-        agrupamento (np.ndarray[int]): Coleção com o index do cluster que cada dado pertence. Resultado do KMeans.predict(x).
-        centroides (list[tuple[int, int]]): Lista de coordenadas do centro de cada cluster.
-        labels (tuple[str,str]): Legendas dos eixos X e Y do gráfico.
-        legends (tuple[str,str] | None): Legendas das cores dos elementos do gráfico.
-        title (str): Título do gráfico.
+        x (pd.DataFrame | np.ndarray): A collection with the data to be plotted.
+        groups (np.ndarray[int]): A collection with the index of the cluster that each data represents. It's the result of KMeans.predict(x)
+        clusters (list[tuple[int, int]]): A list of the center coordinates of each cluster.
+        labels (tuple[str,str]): X and Y axis legends.
+        legends (tuple[str,str] | None): Color legends of the graphic.
+        title (str): Graphic title.
     """    
     plt.figure(figsize=(8,8))
     plt.axes()
@@ -179,33 +187,33 @@ def plot_agrupamento(x: pd.DataFrame | np.ndarray, agrupamento: np.ndarray[int],
     plt.title(title,fontsize=15)
     plt.xlabel(labels[0],fontsize=15)
     plt.ylabel(labels[1],fontsize=15)
-    print(len(agrupamento))
+    print(len(groups))
     
-    dots = plt.scatter(x[:, 0], x[:, 1], c=agrupamento, s=50, cmap='viridis')
+    dots = plt.scatter(x[:, 0], x[:, 1], c=groups, s=50, cmap='viridis')
     cluster_handle = None
-    for x in centroides:
+    for x in clusters:
         cluster = plt.scatter(x[0], x[1], s=300, c=[0], cmap='gist_gray', edgecolors='white', alpha=0.3, marker='X')
         cluster_handle = cluster.legend_elements()[0]
     
     if legends != None:
         plt.legend(legends,prop={'size': 12})
     else:
-        _legends = [f'Grupo {i+1}' for i in range(len(centroides))]
+        _legends = [f'Grupo {i+1}' for i in range(len(clusters))]
         _legends.append('Centróide')
         _handle = dots.legend_elements()[0]
         plt.legend(handles=[*_handle, *cluster_handle], labels=_legends, prop={'size': 12})
     
 
 def plot_real(x: pd.DataFrame | np.ndarray, raw_df: pd.DataFrame , target: str, labels: tuple[str,str], legends: tuple[str,str] | None, title: str):
-    """Exibe em tela um gráfico de dispersão, mapeando as classes que atendem ou não a condição da variável target.
+    """Show on the screen a scatter graphic, mapping classes that satisfies or not the target condition.
 
     Args:
-        x (pd.DataFrame | np.ndarray): Coleção contendo os dados a serem plotados.
-        raw_df (pd.DataFrame): Dataframe cru, sem alterações, para leitura dos registros que atendem à target.
-        target (str): Nome da coluna da variável target.
-        labels (tuple[str,str]): Legendas dos eixos X e Y do gráfico.
-        legends (tuple[str,str] | None): Legendas das cores dos elementos do gráfico.
-        title (str): Título do gráfico.
+        x (pd.DataFrame | np.ndarray): A collection with the data to be plotted. 
+        raw_df (pd.DataFrame): Raw dataframe for target reading.
+        target (str): Target column name.
+        labels (tuple[str,str]): X and Y axis legends.
+        legends (tuple[str,str] | None): Color legends of the graphic.
+        title (str): Graphic title.
     """    
     
     plt.figure(figsize=(8,8))

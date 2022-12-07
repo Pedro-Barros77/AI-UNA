@@ -1,4 +1,4 @@
-[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=A2B5CD&size=25&center=true&vCenter=true&width=1000&lines=print("Trabalho-IA-UNA");n+=+float(input("Nota+do+trabalho:+"));Nota+do+trabalho:+10.0;print("Nota+=+{}+Parabéns!!!"+.format(n)))](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=A2B5CD&size=25&center=true&vCenter=true&width=1000&lines=print("Trabalho-IA-UNA");print("Inteligência+Artificial");print("Análise+de+Dados"))](https://git.io/typing-svg)
 
 <div align="center">
    <img align="center" width="55%" src= "https://user-images.githubusercontent.com/94051879/194399251-72469c60-61c4-4db6-bcff-7a01f1041428.gif">
@@ -17,7 +17,6 @@
  ```
   Trabalho acadêmico realizado em grupo por 8 estudantes da universidade UNA,
   durante as aulas da Unidade Curricular "Inteligência Artificial".
- 
  ```
 </div>
 
@@ -45,7 +44,7 @@
 ### 📊 Base de Dados - Top Games on Google Play
 
 <div align="center">
-   <img align="center"  width="750" height="150" heingth src= "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQI-IzqB3xrnyR8ZYCdWpRGmGneDjAGMyxIg&usqp=CAU">
+   <img align="center"  width="750" height="150" heingth src= "https://user-images.githubusercontent.com/85514585/206224125-186aa8b9-a266-4a92-88ca-5ddb17b62e50.jpg">
 </div>
 
 <br>

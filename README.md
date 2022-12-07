@@ -160,9 +160,33 @@
     </td>
     <td align="center">
       <a href="#">
+        <img align="rigth" alt="numpy" height="60" width="60" src="https://cdn.worldvectorlogo.com/logos/numpy-1.svg"><br>
+        <sub>
+          <b>Numpy</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
         <img align="rigth" alt="pandas" height="60" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/pandas/pandas-original.svg"><br>
         <sub>
           <b>Pandas</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img align="rigth" alt="sklearn" height="60" width="60" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Scikit_learn_logo_small.svg/1280px-Scikit_learn_logo_small.svg.png"><br>
+        <sub>
+          <b>Scikit Learn</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img align="rigth" alt="matplotlib" height="60" width="60" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Matplotlib_icon.svg/2048px-Matplotlib_icon.svg.png"><br>
+        <sub>
+          <b>MatplotLib</b>
         </sub>
       </a>
     </td>
